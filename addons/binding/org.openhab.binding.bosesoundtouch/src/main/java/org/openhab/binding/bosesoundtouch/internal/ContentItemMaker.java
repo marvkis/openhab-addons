@@ -165,7 +165,6 @@ public class ContentItemMaker {
             contentItem = new ContentItem();
             contentItem.setSource("PRODUCT");
             contentItem.setSourceAccount("HDMI_1");
-            contentItem.setUnusedField(0);
             contentItem.setPresetable(false);
         }
         if (contentItem != null) {
@@ -227,7 +226,6 @@ public class ContentItemMaker {
             contentItem = new ContentItem();
             contentItem.setSource("PRODUCT");
             contentItem.setSourceAccount("TV");
-            contentItem.setUnusedField(0);
             contentItem.setPresetable(false);
         }
         if (contentItem != null) {

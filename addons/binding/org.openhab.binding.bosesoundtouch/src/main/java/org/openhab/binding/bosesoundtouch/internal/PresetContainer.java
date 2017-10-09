@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.smarthome.config.core.ConfigConstants;
@@ -26,6 +27,9 @@ import org.openhab.binding.bosesoundtouch.internal.exceptions.ContentItemNotPres
 import org.openhab.binding.bosesoundtouch.internal.exceptions.NoPresetFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * The {@link PresetContainer} class manages a PresetContainer which contains all additional Presets
@@ -119,16 +123,18 @@ public class PresetContainer {
             if (presetFile.exists()) {
                 presetFile.delete();
             }
-            BufferedWriter writer = new BufferedWriter(new FileWriter(presetFile));
             Collection<ContentItem> colletionOfPresets = getAllPresets();
             List<ContentItem> listOfPresets = new ArrayList<>();
             listOfPresets.addAll(colletionOfPresets);
-            // Only openhab Presets got saved
-            for (int i = 6; i < listOfPresets.size(); i++) {
-                ContentItem currentItem = listOfPresets.get(i);
-                writer.write(currentItem.stringToSave());
-                writer.newLine();
+            // Only openhab Presets get saved
+            for (Iterator<ContentItem> cii = listOfPresets.iterator(); cii.hasNext();) {
+                if (cii.next().getPresetID() <= 6) {
+                    cii.remove();
+                }
             }
+            Gson gson = new Gson();
+            BufferedWriter writer = new BufferedWriter(new FileWriter(presetFile));
+            writer.write(gson.toJson(listOfPresets));
             writer.close();
         }
     }
@@ -139,18 +145,19 @@ public class PresetContainer {
                 throw new IOException("Could not load save PRESETS");
             }
             if (presetFile.exists()) {
+                Gson gson = new Gson();
                 BufferedReader reader = new BufferedReader(new FileReader(presetFile));
-                String line = reader.readLine();
-                while (line != null) {
-                    ContentItem item = new ContentItem();
-                    item.createFormString(line);
-                    try {
-                        put(item.getPresetID(), item);
-                    } catch (ContentItemNotPresetableException e) {
-                    }
-                    line = reader.readLine();
-                }
+                Collection<ContentItem> items = gson.fromJson(reader, new TypeToken<Collection<ContentItem>>() {
+                }.getType());
                 reader.close();
+                if (items != null) {
+                    for (ContentItem item : items) {
+                        try {
+                            put(item.getPresetID(), item);
+                        } catch (ContentItemNotPresetableException e) {
+                        }
+                    }
+                }
             }
         }
     }

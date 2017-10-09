@@ -8,6 +8,10 @@
  */
 package org.openhab.binding.bosesoundtouch.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang.StringEscapeUtils;
 import org.openhab.binding.bosesoundtouch.types.OperationModeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +30,8 @@ public class ContentItem {
     private String location;
     private boolean presetable;
     private String itemName;
-    private int unusedField;
     private int presetID;
+    private Map<String, String> additionalAttributes;
 
     /**
      * Creates a new instance of this class
@@ -38,8 +42,8 @@ public class ContentItem {
         location = "";
         presetable = false;
         itemName = "";
-        unusedField = 0;
         presetID = 0;
+        additionalAttributes = new HashMap<>();
     }
 
     /**
@@ -144,8 +148,8 @@ public class ContentItem {
         this.itemName = itemName;
     }
 
-    public void setUnusedField(int unusedField) {
-        this.unusedField = unusedField;
+    public void setAdditionalAttribute(String name, String value) {
+        this.additionalAttributes.put(name, value);
     }
 
     public void setPresetable(boolean presetable) {
@@ -170,10 +174,6 @@ public class ContentItem {
 
     public String getItemName() {
         return itemName;
-    }
-
-    public int getUnusedField() {
-        return unusedField;
     }
 
     public boolean isPresetable() {
@@ -202,16 +202,33 @@ public class ContentItem {
                 xml = "<ContentItem source=\"AUX\" sourceAccount=\"" + sourceAccount + "\"></ContentItem>";
                 break;
             case TV:
-                xml = "<ContentItem unusedField=\"0\" source=\"PRODUCT\" sourceAccount=\"TV\" isPresetable=\"false\" />";
+                xml = "<ContentItem source=\"PRODUCT\" sourceAccount=\"TV\" isPresetable=\"false\" />";
                 break;
             case HDMI1:
-                xml = "<ContentItem unusedField=\"0\" source=\"PRODUCT\" sourceAccount=\"HDMI_1\" isPresetable=\"false\" />";
+                xml = "<ContentItem source=\"PRODUCT\" sourceAccount=\"HDMI_1\" isPresetable=\"false\" />";
                 break;
             default:
-                xml = "<ContentItem " + "unusedField=" + "\"" + unusedField + "\" " + "source=" + "\"" + source + "\" "
-                        + "location=" + "\"" + location + "\" " + "sourceAccount=" + "\"" + sourceAccount + "\" "
-                        + "isPresetable=" + "\"" + presetable + "\">" + "<itemName>" + itemName
-                        + "</itemName></ContentItem>";
+                StringBuilder sbXml = new StringBuilder("<ContentItem");
+                if (source != null) {
+                    sbXml.append(" source=").append(StringEscapeUtils.escapeXml(source)).append("\"");
+                }
+                if (location != null) {
+                    sbXml.append(" location=").append(StringEscapeUtils.escapeXml(location)).append("\"");
+                }
+                if (sourceAccount != null) {
+                    sbXml.append(" sourceAccount=").append(StringEscapeUtils.escapeXml(sourceAccount)).append("\"");
+                }
+                sbXml.append(" isPresetable=").append(presetable).append("\"");
+                for (Map.Entry<String, String> aae : additionalAttributes.entrySet()) {
+                    sbXml.append(" ").append(aae.getKey()).append("=\"")
+                            .append(StringEscapeUtils.escapeXml(aae.getValue())).append("\"");
+                }
+                sbXml.append(">");
+                if (itemName != null) {
+                    sbXml.append("<itemName>").append(itemName).append("</itemName>");
+                }
+                sbXml.append("</ContentItem>");
+                xml = sbXml.toString();
                 break;
         }
         return xml;
@@ -226,59 +243,6 @@ public class ContentItem {
         // return buffer.toString();
         // }
         return itemName;
-    }
-
-    /**
-     * Returns a string, to save the contentItem
-     *
-     * @return a string, to save the contentItem
-     */
-    public String stringToSave() {
-        // private int presetID;
-        // private String source;
-        // private String sourceAccount;
-        // private String location;
-        // private String itemName;
-        // private int unusedField;
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(presetID);
-        sb.append(";");
-        sb.append(source);
-        sb.append(";");
-        sb.append(sourceAccount);
-        sb.append(";");
-        sb.append(location);
-        sb.append(";");
-        sb.append(itemName);
-        sb.append(";");
-        sb.append(unusedField);
-        sb.append(";");
-        return sb.toString();
-    }
-
-    /**
-     * Inits the stats with values parsed form the string s
-     *
-     * @param s a string written with stringToSave()
-     */
-    public void createFormString(String s) {
-        // private int presetID;
-        // private String source;
-        // private String sourceAccount;
-        // private String location;
-        // private String itemName;
-        // private int unusedField;
-
-        String[] parts = s.split(";");
-
-        presetID = Integer.parseInt(parts[0]);
-        source = parts[1];
-        sourceAccount = parts[2];
-        location = parts[3];
-        itemName = parts[4];
-        unusedField = Integer.parseInt(parts[5]);
-        presetable = true;
     }
 
     private boolean isEqual(String s1, String s2) {

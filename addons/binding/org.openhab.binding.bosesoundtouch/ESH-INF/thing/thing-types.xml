@@ -104,12 +104,12 @@
     <channel-type id="zoneAdd">
         <item-type>String</item-type>
         <label>Zone Add</label>
-        <description>Adds a Device to a zone, e.g. "kitchen"/"MACOFKITCHEN"</description>
+        <description>Adds a Device to current zone, e.g. "kitchen"/"MACOFKITCHEN"</description>
     </channel-type>
     <channel-type id="zoneRemove">
         <item-type>String</item-type>
-        <label>Zone Romove</label>
-        <description>Removes a Device from a zone, e.g. "kitchen"/"MACOFKITCHEN"</description>
+        <label>Zone Remove</label>
+        <description>Removes a Device from current zone, e.g. "kitchen"/"MACOFKITCHEN"</description>
     </channel-type>
     <channel-type id="preset">
         <item-type>Number</item-type>

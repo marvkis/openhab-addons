@@ -339,8 +339,23 @@ public class XMLResponseHandler extends DefaultHandler {
             contentItem.setSource(attributes.getValue("source"));
             contentItem.setSourceAccount(attributes.getValue("sourceAccount"));
             contentItem.setLocation(attributes.getValue("location"));
-            contentItem.setUnusedField(Integer.parseInt(attributes.getValue("unusedField")));
             contentItem.setPresetable(Boolean.parseBoolean(attributes.getValue("isPresetable")));
+            for (int attrId = 0; attrId < attributes.getLength(); attrId++) {
+                String attrName = attributes.getLocalName(attrId);
+                if ("source".equalsIgnoreCase(attrName)) {
+                    continue;
+                }
+                if ("location".equalsIgnoreCase(attrName)) {
+                    continue;
+                }
+                if ("sourceAccount".equalsIgnoreCase(attrName)) {
+                    continue;
+                }
+                if ("isPresetable".equalsIgnoreCase(attrName)) {
+                    continue;
+                }
+                contentItem.setAdditionalAttribute(attrName, attributes.getValue(attrId));
+            }
         }
     }
 

@@ -7,14 +7,15 @@ Bundle-Version: 2.1.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
 Import-Package: 
+ com.google.gson,
+ com.google.gson.reflect,
  javax.jmdns,
+ org.apache.commons.lang,
  org.eclipse.jetty.util,
  org.eclipse.jetty.util.component,
  org.eclipse.jetty.websocket.api,
  org.eclipse.jetty.websocket.client,
  org.eclipse.jetty.websocket.common,
- org.openhab.binding.bosesoundtouch,
- org.openhab.binding.bosesoundtouch.handler,
  org.eclipse.smarthome.config.core,
  org.eclipse.smarthome.config.discovery,
  org.eclipse.smarthome.core.library.types,
@@ -24,6 +25,8 @@ Import-Package:
  org.eclipse.smarthome.core.thing.type,
  org.eclipse.smarthome.core.types,
  org.eclipse.smarthome.io.transport.mdns.discovery,
+ org.openhab.binding.bosesoundtouch,
+ org.openhab.binding.bosesoundtouch.handler,
  org.slf4j
 Service-Component: OSGI-INF/*.xml
 Export-Package: org.openhab.binding.bosesoundtouch,
