@@ -38,10 +38,10 @@ public class ContentItem {
      */
     public ContentItem() {
         source = "";
-        sourceAccount = "";
-        location = "";
+        sourceAccount = null;
+        location = null;
         presetable = false;
-        itemName = "";
+        itemName = null;
         presetID = 0;
         additionalAttributes = new HashMap<>();
     }
@@ -210,15 +210,15 @@ public class ContentItem {
             default:
                 StringBuilder sbXml = new StringBuilder("<ContentItem");
                 if (source != null) {
-                    sbXml.append(" source=").append(StringEscapeUtils.escapeXml(source)).append("\"");
+                    sbXml.append(" source=\"").append(StringEscapeUtils.escapeXml(source)).append("\"");
                 }
                 if (location != null) {
-                    sbXml.append(" location=").append(StringEscapeUtils.escapeXml(location)).append("\"");
+                    sbXml.append(" location=\"").append(StringEscapeUtils.escapeXml(location)).append("\"");
                 }
                 if (sourceAccount != null) {
-                    sbXml.append(" sourceAccount=").append(StringEscapeUtils.escapeXml(sourceAccount)).append("\"");
+                    sbXml.append(" sourceAccount=\"").append(StringEscapeUtils.escapeXml(sourceAccount)).append("\"");
                 }
-                sbXml.append(" isPresetable=").append(presetable).append("\"");
+                sbXml.append(" isPresetable=\"").append(presetable).append("\"");
                 for (Map.Entry<String, String> aae : additionalAttributes.entrySet()) {
                     sbXml.append(" ").append(aae.getKey()).append("=\"")
                             .append(StringEscapeUtils.escapeXml(aae.getValue())).append("\"");
