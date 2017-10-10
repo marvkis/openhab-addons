@@ -136,6 +136,9 @@ public class XMLResponseProcessor {
         Map<String, XMLHandlerState> bassCapabilitiesMap = new HashMap<>();
         stateSwitchingMap.put(XMLHandlerState.BassCapabilities, bassCapabilitiesMap);
         bassCapabilitiesMap.put("bassAvailable", XMLHandlerState.BassAvailable);
+        bassCapabilitiesMap.put("bassMin", XMLHandlerState.BassMin);
+        bassCapabilitiesMap.put("bassMax", XMLHandlerState.BassMax);
+        bassCapabilitiesMap.put("bassDefault", XMLHandlerState.BassDefault);
     }
 
 }

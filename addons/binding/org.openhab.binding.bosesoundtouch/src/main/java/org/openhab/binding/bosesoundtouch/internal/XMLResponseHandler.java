@@ -290,6 +290,9 @@ public class XMLResponseHandler extends DefaultHandler {
             case BassTarget:
             case BassActual:
             case BassUpdated:
+            case BassMin:
+            case BassMax:
+            case BassDefault:
             case ContentItemItemName:
             case InfoName:
             case InfoType:
@@ -454,11 +457,16 @@ public class XMLResponseHandler extends DefaultHandler {
             case UnprocessedNoTextExpected:
             case Zone:
             case ZoneUpdated:
-            case BassTarget:
             case VolumeTarget:
             case Sources:
                 logger.debug("{}: Unexpected text data during {}: '{}'", handler.getDeviceName(), state,
                         new String(ch, start, length));
+                break;
+            case BassMin: // @TODO - find out how to dynamically change "channel-type" bass configuration
+            case BassMax: // based on these values...
+            case BassDefault:
+            case BassTarget:
+                // this are currently unprocessed values.
                 break;
             case BassCapabilities:
                 logger.debug("{}: Unexpected text data during {}: '{}'", handler.getDeviceName(), state,
