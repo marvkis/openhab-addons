@@ -10,6 +10,7 @@ package org.openhab.binding.bosesoundtouch.internal.discovery;
 
 import static org.openhab.binding.bosesoundtouch.BoseSoundTouchBindingConstants.*;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.util.Arrays;
@@ -78,14 +79,17 @@ public class SoundTouchDiscoveryParticipant implements MDNSDiscoveryParticipant 
     public ThingUID getThingUID(ServiceInfo info) {
         if (info != null) {
             logger.trace("ServiceInfo: " + info);
-            if (info.getType() != null) {
-                if (info.getType().equals(getServiceType())) {
-                    logger.trace("Discovered a Bose SoundTouch thing with name '{}'", info.getName());
-                    byte[] mac = getMacAddress(info);
-                    if (mac != null) {
-                        return new ThingUID(THING_TYPE_DEVICE, new String(mac));
-                    } else {
-                        return null;
+            ThingTypeUID typeUID = getThingTypeUID(info);
+            if (typeUID != null) {
+                if (info.getType() != null) {
+                    if (info.getType().equals(getServiceType())) {
+                        logger.trace("Discovered a Bose SoundTouch thing with name '{}'", info.getName());
+                        byte[] mac = getMacAddress(info);
+                        if (mac != null) {
+                            return new ThingUID(typeUID, new String(mac));
+                        } else {
+                            return null;
+                        }
                     }
                 }
             }
@@ -96,6 +100,45 @@ public class SoundTouchDiscoveryParticipant implements MDNSDiscoveryParticipant 
     @Override
     public String getServiceType() {
         return "_soundtouch._tcp.local.";
+    }
+
+    private ThingTypeUID getThingTypeUID(ServiceInfo info) {
+        InetAddress[] addrs = info.getInetAddresses();
+        if (addrs.length > 0) {
+            String ip = addrs[0].getHostAddress();
+
+            String deviceType;
+            try {
+                String content = DiscoveryUtil.executeUrl("http://" + ip + ":8090/info");
+                deviceType = DiscoveryUtil.getContentOfFirstElement(content, "type");
+            } catch (IOException e) {
+                return BST_UNKNOWN_THING_TYPE_UID;
+            }
+
+            if (deviceType.toLowerCase().contains("soundtouch 10")) {
+                return BST_10_THING_TYPE_UID;
+            }
+            if (deviceType.toLowerCase().contains("soundtouch 20")) {
+                return BST_20_THING_TYPE_UID;
+            }
+            if (deviceType.toLowerCase().contains("soundtouch 30")) {
+                return BST_30_THING_TYPE_UID;
+            }
+            if (deviceType.toLowerCase().contains("soundtouch 300")) {
+                return BST_300_THING_TYPE_UID;
+            }
+            if (deviceType.toLowerCase().contains("soundtouch wireless link adapter")) {
+                return BST_WLA_THING_TYPE_UID;
+            }
+            if (deviceType.toLowerCase().contains("wave")) {
+                return BST_WSMS_THING_TYPE_UID;
+            }
+            if (deviceType.toLowerCase().contains("amplifier")) {
+                return BST_SA5A_THING_TYPE_UID;
+            }
+            return BST_UNKNOWN_THING_TYPE_UID;
+        }
+        return null;
     }
 
     private byte[] getMacAddress(ServiceInfo info) {

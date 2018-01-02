@@ -8,7 +8,7 @@
  */
 package org.openhab.binding.bosesoundtouch.internal;
 
-import static org.openhab.binding.bosesoundtouch.BoseSoundTouchBindingConstants.*;
+import static org.openhab.binding.bosesoundtouch.BoseSoundTouchBindingConstants.SUPPORTED_THING_TYPES_UIDS;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,15 +37,9 @@ public class BoseSoundTouchHandlerFactory extends BaseThingHandlerFactory {
 
     @Override
     protected ThingHandler createHandler(Thing thing) {
-        ThingTypeUID thingTypeUID = thing.getThingTypeUID();
-
-        if (thingTypeUID.equals(THING_TYPE_DEVICE)) {
-            BoseSoundTouchHandler handler = new BoseSoundTouchHandler(thing, this);
-            registerSoundTouchDevice(handler);
-            return handler;
-        }
-
-        return null;
+        BoseSoundTouchHandler handler = new BoseSoundTouchHandler(thing, this);
+        registerSoundTouchDevice(handler);
+        return handler;
     }
 
     /**

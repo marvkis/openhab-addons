@@ -28,7 +28,7 @@ import org.openhab.binding.bosesoundtouch.internal.exceptions.NoPresetFoundExcep
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 /**
@@ -57,15 +57,7 @@ public class PresetContainer {
             logger.debug("Creating directory {}", folder.getPath());
             folder.mkdirs();
         }
-        presetFile = new File(folder, "presets.txt");
-        if (!presetFile.exists()) {
-            try {
-                presetFile.createNewFile();
-                logger.debug("Creating presetFile {}", presetFile.getPath());
-            } catch (IOException e1) {
-                presetFile = null;
-            }
-        }
+        presetFile = new File(folder, "presets.json");
         try {
             readFromFile();
         } catch (IOException e) {
@@ -120,9 +112,6 @@ public class PresetContainer {
 
     private void writeToFile() throws IOException {
         if (presetFile != null) {
-            if (presetFile.exists()) {
-                presetFile.delete();
-            }
             Collection<ContentItem> colletionOfPresets = getAllPresets();
             List<ContentItem> listOfPresets = new ArrayList<>();
             listOfPresets.addAll(colletionOfPresets);
@@ -132,10 +121,16 @@ public class PresetContainer {
                     cii.remove();
                 }
             }
-            Gson gson = new Gson();
-            BufferedWriter writer = new BufferedWriter(new FileWriter(presetFile));
-            writer.write(gson.toJson(listOfPresets));
-            writer.close();
+
+            if (listOfPresets.size() > 0) {
+                if (presetFile.exists()) {
+                    presetFile.delete();
+                }
+
+                BufferedWriter writer = new BufferedWriter(new FileWriter(presetFile));
+                new GsonBuilder().create().toJson(listOfPresets, writer);
+                writer.close();
+            }
         }
     }
 
@@ -145,10 +140,10 @@ public class PresetContainer {
                 throw new IOException("Could not load save PRESETS");
             }
             if (presetFile.exists()) {
-                Gson gson = new Gson();
                 BufferedReader reader = new BufferedReader(new FileReader(presetFile));
-                Collection<ContentItem> items = gson.fromJson(reader, new TypeToken<Collection<ContentItem>>() {
-                }.getType());
+                Collection<ContentItem> items = new GsonBuilder().create().fromJson(reader,
+                        new TypeToken<Collection<ContentItem>>() {
+                        }.getType());
                 reader.close();
                 if (items != null) {
                     for (ContentItem item : items) {

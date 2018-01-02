@@ -8,13 +8,12 @@
  */
 package org.openhab.binding.bosesoundtouch.internal;
 
+import com.google.gson.annotations.Expose;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.openhab.binding.bosesoundtouch.types.OperationModeType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The {@link ContentItem} class manages a ContentItem
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Traunbauer
  */
 public class ContentItem {
-    private final Logger logger = LoggerFactory.getLogger(ContentItem.class);
 
     private String source;
     private String sourceAccount;
@@ -31,6 +29,7 @@ public class ContentItem {
     private boolean presetable;
     private String itemName;
     private int presetID;
+    @Expose
     private Map<String, String> additionalAttributes;
 
     /**
@@ -127,7 +126,6 @@ public class ContentItem {
             operationMode = OperationModeType.valueOf(source);
             return operationMode;
         } catch (IllegalArgumentException iae) {
-            logger.warn("Unknown SourceType: '{}' - needs to be defined!", source);
             return OperationModeType.OTHER;
         }
     }
