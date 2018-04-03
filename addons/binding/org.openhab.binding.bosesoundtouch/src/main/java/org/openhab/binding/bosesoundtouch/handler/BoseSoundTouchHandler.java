@@ -34,7 +34,6 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingFactory;
-import org.eclipse.smarthome.core.thing.type.TypeResolver;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
@@ -363,7 +362,7 @@ public class BoseSoundTouchHandler extends BaseThingHandler implements WebSocket
         Channel chann = getThing().getChannel(channelId);
         if (chann == null) {
             // refresh thing...
-            Thing newThing = ThingFactory.createThing(TypeResolver.resolve(getThing().getThingTypeUID()),
+            Thing newThing = ThingFactory.createThing(thingTypeRegistry.getThingType(getThing().getThingTypeUID()),
                     getThing().getUID(), getThing().getConfiguration());
             updateThing(newThing);
             chann = getThing().getChannel(channelId);
