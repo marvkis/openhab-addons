@@ -24,6 +24,9 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
+import org.eclipse.smarthome.core.library.types.QuantityType;
+import org.eclipse.smarthome.core.library.unit.SIUnits;
+import org.eclipse.smarthome.core.library.unit.SmartHomeUnits;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.Channel;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -286,7 +289,7 @@ public class TACmiHandler extends BaseThingHandler {
         if (analog) {
             final TACmiMeasureType measureType = TACmiMeasureType
                     .values()[((TACmiChannelConfigurationAnalog) channelConfig).type];
-            final DecimalType dt = (DecimalType) command;
+            final Number dt = (Number) command;
             final double val = dt.doubleValue() * measureType.getOffset();
             modified = message.setValue(outputIdx, (short) val, measureType.ordinal());
         } else {
@@ -352,7 +355,29 @@ public class TACmiHandler extends BaseThingHandler {
 
             if (message.getType() == MessageType.ANALOG) {
                 final AnalogValue value = ((AnalogMessage) message).getAnalogValue(output);
-                updateState(channel.getUID(), new DecimalType(value.value));
+                State newState;
+                switch (value.measureType) {
+                    case TEMPERATURE:
+                        newState = new QuantityType<>(value.value, SIUnits.CELSIUS);
+                        break;
+                    case KILOWATT:
+                        // TA uses kW, in OH we use W
+                        newState = new QuantityType<>(value.value * 1000, SmartHomeUnits.WATT);
+                        break;
+                    case KILOWATTHOURS:
+                        newState = new QuantityType<>(value.value, SmartHomeUnits.KILOWATT_HOUR);
+                        break;
+                    case MEGAWATTHOURS:
+                        newState = new QuantityType<>(value.value, SmartHomeUnits.MEGAWATT_HOUR);
+                        break;
+                    case SECONDS:
+                        newState = new QuantityType<>(value.value, SmartHomeUnits.SECOND);
+                        break;
+                    default:
+                        newState = new DecimalType(value.value);
+                        break;
+                }
+                updateState(channel.getUID(), newState);
             } else {
                 final boolean state = ((DigitalMessage) message).getPortState(output);
                 updateState(channel.getUID(), state ? OnOffType.ON : OnOffType.OFF);
